@@ -38,7 +38,7 @@ class UserSeeder extends Seeder
 
 
         User::factory()
-            ->count(30)
+            ->count(198)
             ->create();
     }
 }

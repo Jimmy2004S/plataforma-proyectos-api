@@ -15,15 +15,15 @@ class ReportSeed extends Seeder
      */
     public function run(): void
     {
-        $posts = Post::all();
-        $users = User::paginate(8);
+        $posts = Post::paginate(10);
+        $users = User::where('role_id', '!=', '1')
+            ->paginate(8 , ['id']);
         $posts->each(function ($post) use ($users) {
             //Iterate over users
             $users->each(function ($user) use ($post) {
-                if ($user->role_id != 1) {
-                    $report = Report::factory()->make([ 'user_id' => $user->id]);
-                    $post->reports()->save($report);
-                }
+                $post->reports()->save(
+                    Report::factory()->make(['user_id' => $user->id])
+                );
             });
         });
     }

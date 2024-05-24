@@ -14,15 +14,16 @@ class PostSeed extends Seeder
      */
     public function run(): void
     {
-        $users = User::all();
+        $users = User::where('role_id', 2)
+            ->where('state', '1')
+            ->orderBy('created_at' , 'ASC')
+            ->paginate(30);
         $users->each(function ($user) {
             //create and associate the users with the post
-            if ($user->role_id == 2 && $user->state == '1') {
-                $user->posts()->saveMany([
-                    Post::factory()->make(),
-                    Post::factory()->make()
-                ]);
-            }
+            $user->posts()->saveMany([
+                Post::factory()->make(),
+                Post::factory()->make()
+            ]);
         });
     }
 }
