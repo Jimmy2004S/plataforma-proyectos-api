@@ -70,12 +70,13 @@ class PostService
                 }
             }
         }
-        $posts = $query->get();
+        $perPage = ($request->has('perPage')) ? $request->get('perPage') : 10; //Check perPage value
+        $posts = $query->paginate($perPage);
         if (!$posts) {
             return null;
         }
-        $perPage = ($request->has('perPage')) ? $request->get('perPage') : 10; //Check perPage value
-        return $this->paginate($perPage, $posts);
+
+        return $posts;
     }
 
     function getById($id)
@@ -162,13 +163,13 @@ class PostService
         }
     }
 
-    //User service functions
     private function applyFilterPostByCareer($query, $value)
     {
         $codigos = $this->getUsersByCareer($value);
-        return $this->postRepository->getByUsersIds($query, $codigos);
+        return $this->postRepository->getByUsersCodesQuery($query, $codigos);
     }
 
+    //User service functions
     private function getUsersByCareer($value)
     {
         $users = $this->userService->getUsersApiByCareer($value); //Get all users by career

@@ -106,7 +106,7 @@ class PostRepository
             }])
             ->selectRaw('posts.*, EXISTS(SELECT 1 FROM likes WHERE likes.post_id = posts.id AND likes.user_id = ?) AS dio_like', [auth()->id()])
             ->orderBy('likes_count', 'DESC')
-            ->limit(10)
+            ->limit(3)
             ->get();
     }
 
@@ -128,5 +128,10 @@ class PostRepository
     function getByQuery($query, $key, $value)
     {
         return $query->where($key, $value);
+    }
+
+    function getByUsersCodesQuery($query, $codes){
+        return $query->join('users' , 'users.id' , '=' , 'posts.user_id')
+        ->whereIn('users.code' , $codes);
     }
 }

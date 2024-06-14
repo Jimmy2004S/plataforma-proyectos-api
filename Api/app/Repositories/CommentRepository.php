@@ -13,7 +13,7 @@ class CommentRepository
     public function select($perPage, $post)
     {
         return $this->comment::where('post_id', $post)
-            ->with(['user:id', 'post:id'])
+            ->with(['user:id,user_name', 'post:id'])
             ->selectRaw('comments.* , EXISTS (SELECT * FROM comments WHERE comments.user_id = ? AND comments.post_id = ?) AS auth_commented', [auth()->id(), $post])
             ->orderBy('created_at', 'DESC')
             ->paginate($perPage);

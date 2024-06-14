@@ -25,13 +25,19 @@ class CommentResource extends JsonResource
             ],
             'relationships' => [
                 'user' => [
+                    'attributes' => [
+                        'user_name' => $this->resource->user->user_name
+                    ],
                     'links' => [
-                        'related' => route('api.user.show', $this->resource->user->getRouteKey())
+                        'related' => route('api.user.show', $this->resource->user->getRouteKey()),
                     ]
                 ],
                 'post' => [
+                    'id' => $this->resource->post->getRouteKey(),
+                    'attributes' => [
+                    ],
                     'links' => [
-                        'related' => route('api.post.show', $this->resource->post->getRouteKey())
+                        'related' => route('api.post.show', $this->resource->post->getRouteKey()),
                     ]
                 ]
             ]

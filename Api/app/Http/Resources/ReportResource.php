@@ -29,13 +29,18 @@ class ReportResource extends JsonResource
             ],
             'relationships' => [
                 'user' => [
+                    'id' => (string) $this->resource->user->getRouteKey(),
+                    'attributes' => [
+                    ],
                     'links' => [
-                        'related' => route('api.user.show', $this->resource->user->getRouteKey())
+                        'related' => route('api.user.show', $this->resource->user->getRouteKey()),
+
                     ]
                 ],
                 'post' => [
                     'links' => [
-                        'related' => route('api.post.show', $this->resource->post->getRouteKey())
+                        'related' => route('api.post.show', $this->resource->post->getRouteKey()),
+                        'id' => (string) $this->resource->post->getRouteKey()
                     ]
                 ]
             ]

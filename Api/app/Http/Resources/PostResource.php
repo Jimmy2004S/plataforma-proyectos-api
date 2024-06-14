@@ -35,7 +35,12 @@ class PostResource extends JsonResource
                 'file' => [
                     'links' => [
                        'related' => route('api.post.files', $this->resource->getRouteKey())
+                    ],
+                'comments' => [
+                    'links' => [
+                       'related' => route('api.comment.index', $this->resource->getRouteKey())
                     ]
+                ]
                 ]
             ],
             'links' => [
