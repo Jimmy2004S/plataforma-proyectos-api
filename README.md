@@ -1,1 +1,1 @@
-Api hecha en Laravel para manejos de proyectos universitarios
+Api hecha en Laravel para manejo de proyectos universitarios
