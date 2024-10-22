@@ -50,7 +50,7 @@ class UserRepository
 
     public function getById($id)
     {
-        return $this->user::where('id', $id)->first();
+        return $this->user::with(['student', 'teacher'])->where('id', $id)->first();
     }
 
     public function getByFilter($filter)

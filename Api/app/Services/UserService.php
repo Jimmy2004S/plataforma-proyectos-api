@@ -114,10 +114,7 @@ class UserService
 
     public function getById($id)
     {
-        $user = $this->userRepository->getById($id);
-        $userApi = Controller::apiUserCodigo($user->code)->json();
-        $fullUser = array_merge($userApi, $user->toArray()); // Join the users' informations
-        return $fullUser;
+        return  $this->userRepository->getById($id);
     }
 
     private function paginate($users, $perPage)
