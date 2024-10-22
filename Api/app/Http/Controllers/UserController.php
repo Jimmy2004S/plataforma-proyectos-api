@@ -42,8 +42,9 @@ class UserController extends Controller
             $exception->status = 409;
             throw $exception;
         }
-
+        
         $user = $this->userService->insert($request);
+
         if($user){
             return AuthResource::make($user);
         }

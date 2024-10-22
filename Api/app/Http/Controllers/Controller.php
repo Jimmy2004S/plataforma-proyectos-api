@@ -15,7 +15,7 @@ class Controller extends BaseController
 
     static function apiUserCodigo($codigo)
     {
-        return Http::get("http://localhost/Plataforma-Proaula/api_uni/api.php?action=get_user_by_codigo&codigo=$codigo");
+        return Http::get(self::$endpoint ."get_user_by_codigo&codigo=$codigo");
     }
 
     static function apiUsers()

@@ -44,15 +44,17 @@ class UserService
 
     public function insert(CreateUserRequest $request)
     {
-        $code = $request->input('data.attributes.code');
-        $userApi = $this->getByApiCode($code);
+        $code               = $request->input('data.attributes.code');
+        $password           = Hash::make($request->input('data.attributes.password'));
+        $userApi            = $this->getByApiCode($code);
         if ($userApi == null) {
             return null;
         }
 
-        $password = Hash::make($request->input('data.attributes.password'));
-        $userTipo = $userApi['tipo'];
-        $role_id = ($userTipo == 'Estudiante') ? 2 : ($userTipo == 'Profesor' ?  3 : 1);
+
+        $userTipo           = $userApi['tipo'];
+        $role_id            = ($userTipo == 'estudiante') ? 2 : ($userTipo == 'profesor' ?  3 : 1);
+
         return $this->userRepository->insert($userApi, $password, $role_id);
     }
 
@@ -156,7 +158,6 @@ class UserService
         $response = Controller::apiUserCodigo($codigo);
         if ($response->status() == 200) {
             $user = $response->json();
-            unset($user['id']);
             return $user;
         }
         return null;

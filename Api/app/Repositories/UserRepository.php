@@ -12,14 +12,30 @@ class UserRepository
 
     public function insert($userApi, $password, $role_id)
     {
-        return $this->user::create([
-            'user_name' => $userApi['nombre'] . '_' . $userApi['apellidos'],
-            'code' => $userApi['codigo'],
-            'email' => $userApi['email'],
-            'role_id' => $role_id,
-            'state' => '1',
-            'password' => $password
+
+        $user = $this->user::create([
+            'user_name'         => $userApi['nombre'] . '_' . $userApi['apellidos'],
+            'code'              => $userApi['codigo'],
+            'email'             => $userApi['email'],
+            'role_id'           => $role_id,
+            'state'             => '1',
+            'password'          => $password
         ]);
+
+        if($role_id == 2){
+            $user->student()->create([
+                'semester'      => $userApi['semestre'],
+                'career'        => $userApi['carrera'],
+                'user_code'     =>  $userApi['codigo']
+            ]);
+        }else if($role_id == 3){
+            $user->teacher()->create([
+                'department'    => $userApi['departamento'],
+                'user_code'     =>  $userApi['codigo']
+            ]);
+        }
+
+        return $user;
     }
 
     public function getByCodes($codes)
