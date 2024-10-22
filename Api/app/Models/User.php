@@ -53,12 +53,12 @@ class User extends Authenticatable
 
     public function student(): HasOne
     {
-        return $this->hasOne(InforStudent::class);
+        return $this->hasOne(InforStudent::class, 'user_code', 'code');
     }
 
     public function teacher(): HasOne
     {
-        return $this->hasOne(InforTeacher::class);
+        return $this->hasOne(InforTeacher::class, 'user_code', 'code');
     }
 
     public function posts(): HasMany
@@ -66,7 +66,8 @@ class User extends Authenticatable
         return $this->hasMany(Post::class);
     }
 
-    public function reports(): HasMany{
+    public function reports(): HasMany
+    {
         return $this->hasMany(Report::class);
     }
 

@@ -18,6 +18,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+
         //Create admin user
         User::create([
             'user_name' => 'Administrador',
@@ -28,17 +29,10 @@ class UserSeeder extends Seeder
             'remember_token' => Str::random(10),
         ]);
 
-        //Usuarios de prueba
-        User::factory()
-        ->createFromApi(1)
-        ->create(['state' => '1']);
-        User::factory()
-        ->createFromApi(120)
-        ->create(['state' => '1']);
+
+        // Create users
+        User::factory()->createWithExtraInfo(30, [120, 1, 119]);
 
 
-        User::factory()
-            ->count(8)
-            ->create();
     }
 }

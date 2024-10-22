@@ -11,6 +11,8 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
+    private static $endpoint = "http://localhost/factories-laravel-proaula-main/api_uni/api.php?action=";
+
     static function apiUserCodigo($codigo)
     {
         return Http::get("http://localhost/Plataforma-Proaula/api_uni/api.php?action=get_user_by_codigo&codigo=$codigo");
@@ -24,7 +26,7 @@ class Controller extends BaseController
 
     static function apiUserId($id)
     {
-        $response = Http::get("http://localhost/Plataforma-Proaula/api_uni/api.php?action=get_user_id&id=$id");
+        $response = Http::get(self::$endpoint."get_user_by_id&id=$id");
         return $response;
     }
 

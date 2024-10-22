@@ -13,11 +13,11 @@ class InforStudent extends Model
     protected $fillable = [
         'semester',
         'career',
-        'user_id'
+        'user_code'
     ];
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_code', 'code');
     }
 }

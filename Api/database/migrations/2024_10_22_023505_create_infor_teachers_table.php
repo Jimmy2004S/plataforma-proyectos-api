@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('infor_teachers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->unique();
+            $table->BigInteger('user_code');
             $table->string('department');
+
+            $table->foreign('user_code')->references('code')->on('users')->cascadeOnDelete();
             $table->timestamps();
         });
     }
