@@ -14,9 +14,7 @@ use Illuminate\Support\Facades\Mail;
 class UserService
 {
 
-    public function __construct(protected UserRepository $userRepository)
-    {
-    }
+    public function __construct(protected UserRepository $userRepository) {}
 
     /*
         state's value must be ( 1 , 0)
@@ -36,10 +34,12 @@ class UserService
                 }
             }
         }
-        $users = $query->get();
-        $users = $this->mixUserLocalWithExternal($users);
+
         $perPage = ($request->has('perPage') ? $request->get('perPage') : 20);
-        return $this->paginate($users, $perPage);
+        $query = $query->with(['student', 'teacher']);
+
+        return $query->paginate($perPage);
+
     }
 
     public function insert(CreateUserRequest $request)
@@ -118,19 +118,6 @@ class UserService
         return $fullUser;
     }
 
-    //private local functions
-    public function mixUserLocalWithExternal($users)
-    {
-        $merge = [];
-        foreach ($users as $user) {
-            $userApi = $this->getByApiCode($user->code);
-            if ($userApi) {
-                $merge[] = array_merge($userApi, $user->toArray());
-            }
-        }
-        return collect($merge);
-    }
-
     private function paginate($users, $perPage)
     {
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
@@ -140,16 +127,17 @@ class UserService
 
     private function applySemesterFilter($query, $value)
     {
-        $semesterUsers = $this->getUsersApiBySemester($value);
-        $userCodigos = collect($semesterUsers)->pluck('codigo');
-        return $query->whereIn('code', $userCodigos);
+        return $query->whereHas('student', function ($q) use ($value) {
+            $q->where('semester', $value);
+        });
     }
+
 
     private function applyCareerFilter($query, $value)
     {
-        $careerUsers = $this->getUsersApiByCareer($value);
-        $userCodigos = collect($careerUsers)->pluck('codigo');
-        return $query->whereIn('code', $userCodigos);
+        return $query->whereHas('student', function ($q) use ($value) {
+            $q->where('career', $value);
+        });
     }
 
     //External api functions

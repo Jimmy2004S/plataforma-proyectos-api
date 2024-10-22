@@ -19,29 +19,31 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         $rol = $this->resource['role_id'];
-        $attributes = [
-            'type' => 'user',
-            'id' => (string) $this->resource['id'],
+
+        return  [
+            'type'  => 'user',
+            'id'    => (string) $this->resource['id'],
             'attributes' => [
-                'user_name' => $this->resource['user_name'],
-                'code' => $this->resource['code'],
-                'email' => $this->resource['email'],
-                'role_id' => $this->resource['role_id'],
-                'description' => $this->resource['description'],
-                'state' => $this->resource['state'],
-                'created_at' => Carbon::parse($this->resource['created_at'])->format('Y-m-d H:i:s'),
+                'user_name'             => $this->resource['user_name'],
+                'code'                  => $this->resource['code'],
+                'email'                 => $this->resource['email'],
+                'role_id'               => $this->resource['role_id'],
+                'description'           => $this->resource['description'],
+                'state'                 => $this->resource['state'],
+                'created_at'            => Carbon::parse($this->resource['created_at'])->format('Y-m-d H:i:s'),
+                'student'               => $this->resource->student ?
+                    [
+                        'career'        => $this->resource->student->career,
+                        'semester'      => $this->resource->student->semester
+                    ] : null,
+                'teacher'               => $this->resource->teacher ?
+                    [
+                        'department'    => $this->resource->teacher->department
+                    ] : null
             ],
             'links' => [
                 'self' => route('api.user.show', $this->resource['id'])
             ]
         ];
-
-        if ($rol == 2) {
-            $attributes['attributes']['semestre'] = $this->resource['semestre'];
-            $attributes['attributes']['carrera'] = $this->resource['carrera'];
-        } elseif ($rol == 3) {
-            $attributes['attributes']['departamento'] = $this->resource['departamento'];
-        }
-        return $attributes;
     }
 }

@@ -116,7 +116,7 @@ class UserFactory extends Factory
             'code' => $code,
             'email' => $userApi['email'],
             'role_id' => $role_id,
-            'password' => Hash::make(Str::random(10)), // Generate a random password
+            'password' => bcrypt('password'), // Generate a random password
             'state' => $this->faker->randomElement(['0', '1']),
             'remember_token' => Str::random(10),
         ]);
