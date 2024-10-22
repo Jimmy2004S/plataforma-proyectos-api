@@ -31,7 +31,7 @@ class UserSeeder extends Seeder
 
 
         // Create users
-        User::factory()->createWithExtraInfo(30, [120, 1, 119]);
+        User::factory()->createWithExtraInfo(5, [120, 1, 119]);
 
 
     }

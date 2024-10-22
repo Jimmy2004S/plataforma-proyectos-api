@@ -50,7 +50,7 @@ class FileFactory extends Factory
     private function img($path)
     {
         // Download the image
-        $url = 'https://source.unsplash.com/random/400x200';
+        $url = 'https://picsum.photos/400/200';
         $content = @file_get_contents($url);
         if ($content === false) {
             throw new \Exception("Could not download image from $url");

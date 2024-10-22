@@ -17,7 +17,7 @@ class PostSeed extends Seeder
         $users = User::where('role_id', 2)
             ->where('state', '1')
             ->orderBy('created_at' , 'ASC')
-            ->paginate(10);
+            ->paginate(2);
         $users->each(function ($user) {
             //create and associate the users with the post
             $user->posts()->saveMany([

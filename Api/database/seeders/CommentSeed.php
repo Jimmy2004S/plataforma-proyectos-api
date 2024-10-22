@@ -15,10 +15,10 @@ class CommentSeed extends Seeder
      */
     public function run(): void
     {
-        $posts = Post::orderBy('created_at' , 'DESC')->paginate(4);
+        $posts = Post::orderBy('created_at' , 'DESC')->paginate(2);
         $users = User::where('role_id', 3)
             ->where('state', '1')
-            ->paginate( 5, ['id']);
+            ->paginate( 2, ['id']);
 
         $posts->each(function ($post) use ($users) {
             $users->each(

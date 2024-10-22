@@ -25,7 +25,7 @@ class ReportFactory extends Factory
         $fileName = Str::slug($title) . '-' . Str::random(4) . '.jpg';
 
         // Download the image
-        $url = 'https://source.unsplash.com/random/400x200';
+        $url = 'https://picsum.photos/400/200';
         $contents = @file_get_contents($url);
 
         if ($contents === false) {

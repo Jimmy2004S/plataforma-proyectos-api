@@ -17,7 +17,7 @@ class ReportSeed extends Seeder
     {
         $posts = Post::paginate(1);
         $users = User::where('role_id', '!=', '1')
-            ->paginate(2, ['id']);
+            ->paginate(1, ['id']);
         $posts->each(function ($post) use ($users) {
             //Iterate over users
             $users->each(function ($user) use ($post) {

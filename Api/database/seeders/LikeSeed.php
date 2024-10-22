@@ -16,11 +16,11 @@ class LikeSeed extends Seeder
     public function run(): void
     {
         $posts = Post::orderBy('created_at', 'ASC')
-            ->paginate(10);
+            ->paginate(2);
         $users = User::where('role_Id', '!=', 1)
             ->where('state', '1')
             ->orderBy('created_at', 'ASC')
-            ->paginate(5 , ['id']);
+            ->paginate(2 , ['id']);
         $posts->each(function ($post) use ($users) {
             //Iterate over users
             $users->each(function ($user) use ($post) {
