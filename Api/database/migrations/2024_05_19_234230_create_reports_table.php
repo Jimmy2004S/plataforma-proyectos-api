@@ -17,9 +17,10 @@ return new class extends Migration
             $table->string('description', 300);
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('post_id');
+            $table->text('path_file');
+
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
             $table->foreign('post_id')->references('id')->on('posts')->cascadeOnDelete();
-            $table->text('path_file');
             $table->timestamps();
         });
     }
