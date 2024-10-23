@@ -78,8 +78,11 @@ class PostController extends Controller
 
     public function relevant()
     {
+
         $user = Auth::user();
+
         $posts = $this->postService->getRelevant($user);
+
         if ($posts->isEmpty()) {
             return response()->json([], 204);
         }

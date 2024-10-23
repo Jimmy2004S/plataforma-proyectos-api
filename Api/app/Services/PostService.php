@@ -12,9 +12,7 @@ use Illuminate\Support\Facades\Storage;
 class PostService
 {
 
-    function __construct(protected PostRepository $postRepository, protected UserService $userService)
-    {
-    }
+    function __construct(protected PostRepository $postRepository, protected UserService $userService) {}
 
     function insert(CreatePostRequest $request)
     {
@@ -94,9 +92,12 @@ class PostService
 
     function getRelevant($user)
     {
-        $usersApi = $this->userService->getByApiCode($user->code); // Get the current user
-        $codigos = $this->getUsersByCareer($usersApi['carrera']);
-        $posts = $this->postRepository->getByUsersCodes($codigos);
+
+        $career     = $user->student->career; // Acceder a la propiedad 'semester'
+        $query      = $this->postRepository->query();
+
+        $posts      = $this->postRepository->getByUsersCareerQuery($query, $career)->paginate(10);
+
         if(!$posts){
             return null;
         }
@@ -168,12 +169,12 @@ class PostService
 
     private function applyFilterPostByCareer($query, $value)
     {
-        return $this->postRepository->getByUsersCareerQuery($query,$value);
+        return $this->postRepository->getByUsersCareerQuery($query, $value);
     }
 
     private function applyFilterPostBySemester($query, $value)
     {
-        return $this->postRepository->getByUsersSemesterQuery($query,$value);
+        return $this->postRepository->getByUsersSemesterQuery($query, $value);
     }
 
     //User service functions
