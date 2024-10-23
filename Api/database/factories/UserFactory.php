@@ -7,6 +7,7 @@ use App\Models\InforStudent;
 use App\Models\InforTeacher;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use PhpParser\Node\NullableType;
@@ -20,6 +21,7 @@ class UserFactory extends Factory
      * The current password being used by the factory.
      */
     protected static ?string $password;
+    protected static Response  $apiData;
 
     /**
      * Define the model's default state.
@@ -53,88 +55,56 @@ class UserFactory extends Factory
         ]);
     }
 
-    public function createFromApi($idFromApi = null)
-    {
-        if (!is_null($idFromApi)) {
-            $userData = Controller::apiUserId($idFromApi);
-
-            return $this->state(function (array $attributes) use ($userData) {
-                return [
-                    'user_name' => $userData['nombre'] . "_" . $userData['apellidos'],
-                    'code' => $userData['codigo'],
-                    'email' => $userData['email'],
-                    'role_id' => ($userData['tipo'] == 'Estudiante') ? 2 : 3,
-                ];
-            });
-        }
-    }
-
     /**
      * @param int $count Number of model instances to create
      * @param array $ids User IDs to create from the API
      * @return \Illuminate\Support\Collection Collection of users
      */
-    public function createWithExtraInfo(int $count = 1, array $ids = [])
+    public function createWithExtraInfo($id)
     {
-        $users = collect();
+        return $this->state(function () use ($id) {
+            $userApi = Controller::apiUserId($id);
+            self::$apiData = $userApi;
+            // self::$apiData = $userApi;
+            $role_id = ($userApi['tipo'] == 'estudiante') ? 2 : 3;
+            $code = $userApi['codigo'];
+            return [
+                'user_name' => $userApi['nombre'] . "_" . $userApi['apellidos'],
+                'code' => $code,
+                'email' => $userApi['email'],
+                'role_id' => $role_id,
+                'password' => bcrypt('password'), // Generate a random password
+                'state' => $this->faker->randomElement(['0', '1']),
+                'remember_token' => Str::random(10),
+            ];
+        });
+    }
 
-        // First, create users based on the provided $ids
-        for ($i = 0; $i < count($ids); $i++) {
-            $users->push($this->createUser($ids[$i]));
-        }
+    /**
+     * Crear las relaciones después de crear el usuario.
+     */
+    public function configure()
+    {
+        return $this->afterCreating(function (User $user) {
+            // Obtener los datos de la API directamente basados en el código del usuario
+            self::$apiData;
 
-        // Then, create users from 1 to $count, skipping already created $ids
-        for ($i = 1; $i <= $count; $i++) {
-            // Skip the user creation if the current $i is already in the $ids array
-            if (!empty($ids) && in_array($i, $ids)) {
-                continue;
+            if ($user->role_id == 2 && self::$apiData) {
+                $user->student()->create([
+                    'career' => self::$apiData['carrera'] ?? 'Temporal',
+                    'semester' => self::$apiData['semestre'] ?? 0,
+                    'user_code' => $user->code,
+                ]);
             }
 
-            // Create a new user if it's not in the provided $ids
-            $users->push($this->createUser($i));
-        }
-
-        // Return the collection of users
-        return $users;
+            if ($user->role_id == 3 && self::$apiData) {
+                $user->teacher()->create([
+                    'department' => self::$apiData['departamento'] ?? 'Temporal',
+                    'user_code' => $user->code,
+                ]);
+            }
+        });
     }
 
-    private function createUser($idNodelModelo)
-    {
-        // Get user information from the API
-        $userApi = Controller::apiUserId($idNodelModelo);
 
-        if (!$userApi) {
-            return null; // Return null if no user info is retrieved
-        }
-
-        $role_id = ($userApi['tipo'] == 'estudiante') ? 2 : 3;
-        $code = $userApi['codigo'];
-
-        // Create the user
-        $user = User::create([
-            'user_name' => $userApi['nombre'] . "_" . $userApi['apellidos'],
-            'code' => $code,
-            'email' => $userApi['email'],
-            'role_id' => $role_id,
-            'password' => bcrypt('password'), // Generate a random password
-            'state' => $this->faker->randomElement(['0', '1']),
-            'remember_token' => Str::random(10),
-        ]);
-
-        // Save additional user information
-        if ($user->role_id == 2) {
-            $user->student = InforStudent::create([
-                'career' => $userApi['carrera'] ?? null,
-                'semester' => $userApi['semestre'] ?? null,
-                'user_code' => $user->code,
-            ]);
-        } elseif ($user->role_id == 3) {
-            $user->teacher = InforTeacher::create([
-                'department' => $userApi['departamento'] ?? 'Assigned department',
-                'user_code' => $user->code,
-            ]);
-        }
-
-        return $user;
-    }
 }

@@ -37,8 +37,10 @@ class ListUserTest extends TestCase
     private function setUpCase2(): void
     {
         $this->setUpBase();
-        $this->users = User::factory()
-            ->createWithExtraInfo(2, [120, 118]);
+        $this->users[] = User::factory()
+            ->createWithExtraInfo(120)->create();
+        $this->users[] = User::factory()
+            ->createWithExtraInfo(118)->create();
         // $this->users[] = User::factory()->create([
         //     'state' => '0'
         // ]);
@@ -48,7 +50,8 @@ class ListUserTest extends TestCase
     private function setUpCase3(): void
     {
         $this->setUpBase();
-        $this->users[] = User::factory()->createWithExtraInfo(0, [1, 120]);
+        $this->users[] = User::factory()->createWithExtraInfo(120)->create();
+        $this->users[] = User::factory()->createWithExtraInfo(1)->create();
 
     }
 
@@ -59,7 +62,9 @@ class ListUserTest extends TestCase
     {
         $this->setUpBase(); // Base setup
         $user = User::factory()
-            ->createWithExtraInfo(1, [rand(100,120)]);
+            ->createWithExtraInfo(rand(100,110))->create([
+                'state' => '1'
+            ]);
 
         $user = $user->first();
 

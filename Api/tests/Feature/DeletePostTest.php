@@ -21,7 +21,7 @@ class DeletePostTest extends TestCase
         Role::factory(3)->create();
         //Create a new user
         $this->user = User::factory()
-            ->createFromApi(1)
+            ->createWithExtraInfo(1)
             ->state(function (array $attributes) {
                 return ['state' => '1'];
             })

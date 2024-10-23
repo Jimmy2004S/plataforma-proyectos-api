@@ -21,10 +21,13 @@ class CreatePostTest extends TestCase
         //Create roles
         Role::factory(3)->create();
         //Create a new user
-        $this->user = User::factory(1)->create([
-            'state' => '1',
-            'role_id' => 2
-        ])->first();
+        $this->user = User::factory()
+            ->createWithExtraInfo(1)
+            ->create([
+                'state' => '1',
+                'role_id' => 2
+            ])->first();
+
         Storage::fake('public');
         $this->file = UploadedFile::fake()->create('document.pdf');
         $this->cover_image = UploadedFile::fake()->image('cover_image.jpg');
@@ -33,7 +36,6 @@ class CreatePostTest extends TestCase
     use RefreshDatabase;
     public function test_student_can_create_post(): void
     {
-        $this->withoutExceptionHandling();
         $response = $this->withHeaders(
             [
                 'Authorization' => 'Bearer ' . $this->user->createToken('TestToken', ['student'])->plainTextToken

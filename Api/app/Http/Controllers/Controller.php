@@ -30,6 +30,13 @@ class Controller extends BaseController
         return $response;
     }
 
+    static function apiUserIds($ids)
+    {
+        $idsParam = $ids.join(',');
+        $response = Http::get(self::$endpoint."get_user_by_id&id=$idsParam");
+        return $response;
+    }
+
     static function apiUsersFilter($filter)
     {
         return Http::get("http://localhost/Plataforma-Proaula/api_uni/api.php?action=filtrar_usuarios&busqueda=$filter");

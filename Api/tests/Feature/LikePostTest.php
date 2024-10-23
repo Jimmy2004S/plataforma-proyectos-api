@@ -20,7 +20,7 @@ class LikePostTest extends TestCase
         parent::setUp();
         Role::factory(3)->create();
         $this->user = User::factory()
-            ->createFromApi(1)
+            ->createWithExtraInfo(1)
             ->state(function (array $attributes) {
                 return ['state' => '1'];
             })
@@ -45,7 +45,7 @@ class LikePostTest extends TestCase
         )->getJson(Route('api.like.post', $this->post->first()->getRouteKey()));
         $response->assertStatus(204);
         $like = Like::where('post_id', $this->post->first()->getRouteKey())
-        ->where('user_id', $this->user->getRouteKey())->first();
+            ->where('user_id', $this->user->getRouteKey())->first();
         $this->assertNotNull($like);
     }
 
@@ -61,7 +61,7 @@ class LikePostTest extends TestCase
         )->deleteJson(Route('api.unlike.post', $this->post->first()->getRouteKey()));
         $response->assertStatus(204);
         $like = Like::where('post_id', $this->post->first()->getRouteKey())
-        ->where('user_id', $this->user->getRouteKey())->first();
+            ->where('user_id', $this->user->getRouteKey())->first();
         $this->assertNull($like);
     }
 }

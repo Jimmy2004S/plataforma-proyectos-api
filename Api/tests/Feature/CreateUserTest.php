@@ -110,7 +110,7 @@ class CreateUserTest extends TestCase
     }
 
     public function test_user_is_already_registered(){
-        $user = User::factory(1)->create([
+        $user = User::factory()->createWithExtraInfo(1)->create([
             'state' => '1'
         ])->first();
 

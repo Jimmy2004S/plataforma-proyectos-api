@@ -29,10 +29,16 @@ class UserSeeder extends Seeder
             'remember_token' => Str::random(10),
         ]);
 
-
-        // Create users
-        User::factory()->createWithExtraInfo(5, [120, 1, 119]);
-
+        for ($i = 100; $i <= 120; $i++) {
+            // Create users
+            $state =  $i % 2 == 0 ? '1' : '0';
+            User::factory()->createWithExtraInfo($i)
+            ->state(function (array $attributes) use ($state) {
+                return [
+                    'state' => $state,
+                ];
+            })->create();
+        }
 
     }
 }

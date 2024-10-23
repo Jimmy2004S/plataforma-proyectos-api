@@ -64,6 +64,7 @@ class UserService
         if (!$user) {
             return null;
         }
+
         $oldState = $user->state;
 
         // Change user state

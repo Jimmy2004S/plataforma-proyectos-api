@@ -24,28 +24,31 @@ class ListPostTest extends TestCase
     private function setUpCase1(): void
     {
         $this->setUpBase();
-        User::factory()
-            ->count(3)
-            ->create();
+        $this->withoutExceptionHandling();
 
-        $user = User::factory()
-            ->createFromApi(1) //Create a specific user
-            ->state(function (array $attributes) {
-                return ['state' => '1'];
-            })
-            ->has(Post::factory()->count(2)) // Create 2 post
-            ->create();
+        $user               =  $this->setUpSpecificUser();
 
-        $users = User::all();
+        for ($i = 118; $i <= 120; $i++) {
+            // Create users
+            $state =  $i % 2 == 0 ? '1' : '0';
+            User::factory()->createWithExtraInfo($i)
+                ->state(function (array $attributes) use ($state) {
+                    return [
+                        'state' => $state,
+                    ];
+                })->create();
+        }
+
+        $users              = User::all();
         $users->each(function ($user) {
-            if ($user->role_id == 2 && $user->state == '1' && $user->id != 1) {
-                $user->posts()->saveMany([
+            if ($user->role_id == 2 && $user->state == '1') {
+                $user->posts()->save(
                     Post::factory()->make(),
-                ]);
+                );
             }
         });
 
-        $posts = Post::all();
+        $posts              = Post::all();
         $posts->each(function ($post) use ($users) {
             //Create and associate the files with the post
             $post->files()->saveMany([
@@ -61,22 +64,28 @@ class ListPostTest extends TestCase
                 }
             });
         });
-        $this->posts = Post::withCount('likes')->get();
-        $this->user = $user;
-        $this->withoutExceptionHandling();
+        $this->posts        = Post::withCount('likes')->get();
+        $this->user         = $user;
+    }
+
+
+    private function setUpSpecificUser()
+    {
+        return User::factory()->createWithExtraInfo(1)
+            ->state(function (array $attributes) {
+                return [
+                    'state' => '1',
+                ];
+            })->has(Post::factory()->count(2)) // Create 2 post
+            ->create();
     }
 
     private function setUpCase2(): void
     {
         $this->setUpBase();
         //Create a new user
-        $this->user = User::factory()
-            ->createFromApi(1)
-            ->state(function (array $attributes) {
-                return ['state' => '1'];
-            })
-            ->has(Post::factory()->count(1))
-            ->create();
+        $this->user = $this->setUpSpecificUser();
+
         $like = new Like(['user_id' => $this->user->id]);
         $post = Post::first();
         $post->likes()->save($like);
@@ -99,6 +108,7 @@ class ListPostTest extends TestCase
             'Authorization',
             'Bearer ' . $this->user->createToken('TestToken')->plainTextToken
         )->getJson(route('api.post.index') . '?page=1');
+
         $postsResponse = $response->json()['data'];
         $response->assertJsonApiPostsResource($this->posts, $postsResponse, $this);
     }
@@ -146,8 +156,7 @@ class ListPostTest extends TestCase
         $response = $this->withHeader(
             'Authorization',
             'Bearer ' . $this->user->createToken('TestToken')->plainTextToken
-        )
-            ->getJson(route('api.post.index') . '?filter[career]=Contabilidad');
+        )->getJson(route('api.post.index') . '?filter[career]=Contabilidad');
         $postsResponse = $response->json()['data'];
         $response->assertJsonApiPostsResource($this->posts, $postsResponse, $this);
     }
@@ -163,6 +172,7 @@ class ListPostTest extends TestCase
     //     $postsResponse = $response->json()['data'];
     //     $response->assertJsonApiPostsResource($this->posts, $postsResponse, $this);
     // }
+    
     /**
       @test
      */
