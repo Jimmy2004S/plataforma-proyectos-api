@@ -102,13 +102,6 @@ class UserService
         return  $this->userRepository->getById($id);
     }
 
-    private function paginate($users, $perPage)
-    {
-        $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $currentPageItems = $users->forPage($currentPage, $perPage);
-        return new LengthAwarePaginator($currentPageItems, $users->count(), $perPage, $currentPage);
-    }
-
     private function applySemesterFilter($query, $value)
     {
         return $query->whereHas('student', function ($q) use ($value) {
@@ -122,17 +115,6 @@ class UserService
         return $query->whereHas('student', function ($q) use ($value) {
             $q->where('career', $value);
         });
-    }
-
-    //External api functions
-    public function getUsersApiByCareer($career)
-    {
-        return Controller::apiUsersbyCarrera($career)->json();
-    }
-
-    public function getUsersApiBySemester($semester)
-    {
-        return Controller::apiUsersbySemestre($semester)->json();
     }
 
     public function getByApiCode($codigo)

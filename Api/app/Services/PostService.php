@@ -150,14 +150,6 @@ class PostService
         return $post->files;
     }
 
-    private function paginate($perPage, $posts)
-    {
-        $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $currentPageItems = $posts->forPage($currentPage, $perPage); //only elements from the current page
-        return  new LengthAwarePaginator($currentPageItems, $posts->count(), $perPage, $currentPage); //Create instance of pagination
-
-    }
-
     private function storeFile(UploadedFile $file, $path)
     {
         if (app()->environment('testing')) {
@@ -177,10 +169,4 @@ class PostService
         return $this->postRepository->getByUsersSemesterQuery($query, $value);
     }
 
-    //User service functions
-    private function getUsersByCareer($value)
-    {
-        $users = $this->userService->getUsersApiByCareer($value); //Get all users by career
-        return collect($users)->pluck('codigo')->toArray(); // Get users's ids
-    }
 }
