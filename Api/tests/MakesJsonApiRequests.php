@@ -114,7 +114,11 @@ trait MakesJsonApiRequests
                     'type',
                     'id',
                     'attributes' => [
-                        'user_name', 'code', 'email', 'role_id', 'description',
+                        'user_name',
+                        'code',
+                        'email',
+                        'role_id',
+                        'description',
                         'state',
                     ],
                     'links' => ['self']
@@ -126,10 +130,10 @@ trait MakesJsonApiRequests
             $createUserTest->assertEquals($userResponse['attributes']['role_id'], $user->role_id);
             //check the corresponding keys
             if ($user->role_id == 2) {
-                $createUserTest->assertArrayHasKey('semestre', $userResponse['attributes']);
-                $createUserTest->assertArrayHasKey('carrera', $userResponse['attributes']);
+                $createUserTest->assertArrayHasKey('semester', $userResponse['attributes']['student']);
+                $createUserTest->assertArrayHasKey('career', $userResponse['attributes']['student']);
             } elseif ($user->role_id == 3) {
-                $createUserTest->assertArrayHasKey('departamento', $userResponse['attributes']);
+                $createUserTest->assertArrayHasKey('department', $userResponse['attributes']['teacher']);
             }
         };
     }
@@ -172,17 +176,17 @@ trait MakesJsonApiRequests
                     $listUserTest->assertEquals($userResponse['attributes']['state'], $user->state);
                     //check the corresponding keys
                     if ($user->role_id == 2) {
-                        $listUserTest->assertArrayHasKey('semestre', $userResponse['attributes']);
-                        $listUserTest->assertArrayHasKey('carrera', $userResponse['attributes']);
+                        $listUserTest->assertArrayHasKey('semester', $userResponse['attributes']['student']);
+                        $listUserTest->assertArrayHasKey('career', $userResponse['attributes']['student']);
                     } elseif ($user->role_id == 3) {
-                        $listUserTest->assertArrayHasKey('departamento', $userResponse['attributes']);
+                        $listUserTest->assertArrayHasKey('department', $userResponse['attributes']['teacher']);
                     }
                     if ($param) {
                         foreach ($param as $key => $value) {
                             if ($key == 'role') {
                                 $listUserTest->assertEquals($value, $user->role_id);
                             }
-                            if($key == 'state'){
+                            if ($key == 'state') {
                                 $listUserTest->assertEquals($value, $user->state);
                             }
                         }

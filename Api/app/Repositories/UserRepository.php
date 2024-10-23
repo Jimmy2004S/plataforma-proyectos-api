@@ -53,7 +53,7 @@ class UserRepository
 
     public function getByFilter($filter, $perPage)
     {
-        // Convertir el filtro a minúsculas
+
         $filter = strtolower($filter);
 
         $query = $this->user::with(['student', 'teacher']);
@@ -69,7 +69,7 @@ class UserRepository
 
         // students filter
         $query->orWhereHas('student', function ($q) use ($filter) {
-            $q->whereRaw('LOWER(CONCAT("semestre ", semester)) LIKE ?', ['%' . $filter . '%'])
+            $q->whereRaw('LOWER("semestre " ||  semester) LIKE ?', [$filter . '%'])
                 ->orWhereRaw('LOWER(career) LIKE ?', ['%' . $filter . '%']);
         });
 

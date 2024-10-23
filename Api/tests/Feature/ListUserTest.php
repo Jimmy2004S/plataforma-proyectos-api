@@ -37,18 +37,19 @@ class ListUserTest extends TestCase
     private function setUpCase2(): void
     {
         $this->setUpBase();
-        $this->users = User::factory(5)->create();
-        $this->users[] = User::factory()->create([
-            'state' => '0'
-        ]);
+        $this->users = User::factory()
+            ->createWithExtraInfo(2, [120, 118]);
+        // $this->users[] = User::factory()->create([
+        //     'state' => '0'
+        // ]);
     }
 
     // Setup specific for case 3
     private function setUpCase3(): void
     {
         $this->setUpBase();
-        $this->users[] = User::factory()->createFromApi(120)->create();
-        $this->users[] = User::factory()->createFromApi(1)->create();
+        $this->users[] = User::factory()->createWithExtraInfo(0, [1, 120]);
+
     }
 
     /**
@@ -57,11 +58,16 @@ class ListUserTest extends TestCase
     public function show_user()
     {
         $this->setUpBase(); // Base setup
-        $user = User::factory()->create();
+        $user = User::factory()
+            ->createWithExtraInfo(1, [rand(100,120)]);
+
+        $user = $user->first();
+
         // Send a request with header 'Authorization'
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->admin->createToken('TestToken')->plainTextToken
         ])->getJson(route('api.user.show', $user->getRouteKey()));
+
         $userResponse = $response->json()['data'];
         $response->assertJsonApiUserResource($user, $userResponse, $this, 200);
     }
@@ -117,7 +123,7 @@ class ListUserTest extends TestCase
             'Authorization' => 'Bearer ' . $this->admin->createToken('TestToken', ['admin'])->plainTextToken
         ])->getJson(route('api.user.index') . '?filter[role_id]=2');
         $userResponse = $response->json()['data'];
-        $response->assertJsonUsersFilterResource($this->users, $userResponse, $this , ["role" => 2]);
+        $response->assertJsonUsersFilterResource($this->users, $userResponse, $this, ["role" => 2]);
     }
 
     /**
@@ -131,7 +137,7 @@ class ListUserTest extends TestCase
             'Authorization' => 'Bearer ' . $this->admin->createToken('TestToken')->plainTextToken
         ])->getJson(route('api.user.index') . '?filter[role_id]=2&filter[state]=1');
         $userResponse = $response->json()['data'];
-        $response->assertJsonUsersFilterResource($this->users, $userResponse, $this, ["role" => 2 , "state" => "1"]);
+        $response->assertJsonUsersFilterResource($this->users, $userResponse, $this, ["role" => 2, "state" => "1"]);
     }
 
     /**
@@ -143,7 +149,7 @@ class ListUserTest extends TestCase
         // Send a request with header 'Authorization'
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->admin->createToken('TestToken')->plainTextToken
-        ])->getJson(route('api.user.index') . '?filter[semester]=4');
+        ])->getJson(route('api.user.index') . '?filter[semester]=semester 4');
         $userResponse = $response->json()['data'];
         $response->assertJsonUsersFilterResource($this->users, $userResponse, $this);
     }

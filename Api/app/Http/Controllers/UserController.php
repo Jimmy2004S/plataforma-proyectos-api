@@ -14,14 +14,12 @@ class UserController extends Controller
 {
 
     //Inject UserService
-    public function __construct(protected UserService $userService)
-    {
-    }
+    public function __construct(protected UserService $userService) {}
 
     function index(Request $request)
     {
         $users = $this->userService->getAll($request);
-        if(!$users){
+        if (!$users) {
             return response()->json([], 204);
         }
         return UserCollection::make($users);
@@ -42,10 +40,10 @@ class UserController extends Controller
             $exception->status = 409;
             throw $exception;
         }
-        
+
         $user = $this->userService->insert($request);
 
-        if($user){
+        if ($user) {
             return AuthResource::make($user);
         }
 
@@ -62,8 +60,8 @@ class UserController extends Controller
     function show($id)
     {
         $user = $this->userService->getById($id);
-        if(!$user){
-            return response()->json([] , 204);
+        if (!$user) {
+            return response()->json([], 204);
         }
         return UserResource::make($user);
     }
@@ -71,9 +69,13 @@ class UserController extends Controller
     public function filterUser(Request $request, $filter)
     {
         $users = $this->userService->filter($request, $filter);
-        if (empty($users)) {
-            return response()->json([], 204);
+
+        if ($users instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+            if ($users->total() === 0) {
+                return response()->json([], 204);
+            }
         }
+
         return UserCollection::make($users);
     }
 }
