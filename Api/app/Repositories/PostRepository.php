@@ -6,9 +6,7 @@ use App\Models\Post;
 
 class PostRepository
 {
-    function __construct(protected Post $post)
-    {
-    }
+    function __construct(protected Post $post) {}
 
     function insert($title, $description, $user_id)
     {
@@ -130,8 +128,23 @@ class PostRepository
         return $query->where($key, $value);
     }
 
-    function getByUsersCodesQuery($query, $codes){
-        return $query->join('users' , 'users.id' , '=' , 'posts.user_id')
-        ->whereIn('users.code' , $codes);
+    function getByUsersCodesQuery($query, $codes)
+    {
+        return $query->join('users', 'users.id', '=', 'posts.user_id')
+            ->whereIn('users.code', $codes);
+    }
+
+    public function getByUsersCareerQuery($query, $value)
+    {
+        return $query->whereHas('user.student', function ($q) use ($value) {
+            $q->where('career', $value);
+        });
+    }
+
+    public function getByUsersSemesterQuery($query, $value)
+    {
+        return $query->whereHas('user.student', function ($q) use ($value) {
+            $q->where('semester', $value);
+        });
     }
 }

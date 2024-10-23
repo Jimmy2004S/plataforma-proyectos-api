@@ -65,13 +65,16 @@ class PostService
                 if ($key == 'career') {
                     $query = $this->applyFilterPostByCareer($query, $value);
                 } else if ($key == 'semester') {
+                    $query = $this->applyFilterPostBySemester($query, $value);
                 } else {
                     $query = $this->postRepository->getByQuery($query, $key, $value);
                 }
             }
         }
+
         $perPage = ($request->has('perPage')) ? $request->get('perPage') : 10; //Check perPage value
         $posts = $query->paginate($perPage);
+
         if (!$posts) {
             return null;
         }
@@ -165,8 +168,12 @@ class PostService
 
     private function applyFilterPostByCareer($query, $value)
     {
-        $codigos = $this->getUsersByCareer($value);
-        return $this->postRepository->getByUsersCodesQuery($query, $codigos);
+        return $this->postRepository->getByUsersCareerQuery($query,$value);
+    }
+
+    private function applyFilterPostBySemester($query, $value)
+    {
+        return $this->postRepository->getByUsersSemesterQuery($query,$value);
     }
 
     //User service functions
