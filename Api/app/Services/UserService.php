@@ -85,26 +85,10 @@ class UserService
 
     public function filter($request, $filter)
     {
-        $merge = [];
-        $usersApi = Controller::apiUsersFilter($filter)->json();
-        // Determine if matches were found in the external API
-        $matchesFound = isset($usersApi['message']) && $usersApi['message'] === "No encontrado" ? false : true;
-        // Get users from the local bd on the filter
-        $users = $this->userRepository->getByFilter($filter);
-        // Process users based on whether matches were found in the external API
-        foreach ($matchesFound ? $usersApi : $users as $index => $userData) {
-            // Get user data based on where the data was obtained from
-            $user = $matchesFound ? $this->userRepository->getByCode($userData['codigo']) : $users[$index];
-            // Check if the user exists and merge user data with API data
-            if ($user) {
-                $merge[] = array_merge($matchesFound ? $userData : $this->getByApiCode($user->code), $user->toArray());
-            }
-        }
-        if (empty($merge)) {
-            return $merge;
-        }
+
         $perPage = ($request->has('perPage') ? $request->get('perPage') : 20);
-        return $this->paginate(collect($merge), $perPage);
+
+        return $this->userRepository->getByFilter($filter, $perPage);
     }
 
     public function getByCode($code)

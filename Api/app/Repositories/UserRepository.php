@@ -6,9 +6,7 @@ use App\Models\User;
 
 class UserRepository
 {
-    function __construct(protected User $user)
-    {
-    }
+    function __construct(protected User $user) {}
 
     public function insert($userApi, $password, $role_id)
     {
@@ -22,13 +20,13 @@ class UserRepository
             'password'          => $password
         ]);
 
-        if($role_id == 2){
+        if ($role_id == 2) {
             $user->student()->create([
                 'semester'      => $userApi['semestre'],
                 'career'        => $userApi['carrera'],
                 'user_code'     =>  $userApi['codigo']
             ]);
-        }else if($role_id == 3){
+        } else if ($role_id == 3) {
             $user->teacher()->create([
                 'department'    => $userApi['departamento'],
                 'user_code'     =>  $userApi['codigo']
@@ -53,16 +51,37 @@ class UserRepository
         return $this->user::with(['student', 'teacher'])->where('id', $id)->first();
     }
 
-    public function getByFilter($filter)
+    public function getByFilter($filter, $perPage)
     {
-        $query = $this->user::query();
-        $query->where('user_name', 'LIKE', '%' . $filter . '%')
-            ->orWhere('state', 'LIKE', ($filter == "Activo" || $filter == "activo") ? 1 : (($filter == "Inactivo" || $filter == "inactivo") ? 0 : 3))
-            ->orWhere('role_id', 'LIKE', ($filter == "Estudiante") ? 2 : ($filter == "Profesor" ? 3 : 0))
-            ->orWhere('code' , 'LIKE' , $filter . '%');
+        // Convertir el filtro a minúsculas
+        $filter = strtolower($filter);
+
+        $query = $this->user::with(['student', 'teacher']);
+
+        $query->where(function ($subQuery) use ($filter) {
+            $subQuery->whereRaw('LOWER(user_name) LIKE ?', ['%' . $filter . '%'])
+                ->orWhereRaw('LOWER(code) LIKE ?', [$filter . '%'])
+                ->orWhere('role_id', 'LIKE', ($filter == "estudiante") ? 2 : (($filter == "profesor") ? 3 : 0))
+                ->orWhere('state', 'LIKE', ($filter == "activo") ? 1 : (($filter == "inactivo") ? 0 : 3));
+        });
+
         $query->where('role_id', '!=', 1);
-        return $query->get();
+
+        // students filter
+        $query->orWhereHas('student', function ($q) use ($filter) {
+            $q->whereRaw('LOWER(CONCAT("semestre ", semester)) LIKE ?', ['%' . $filter . '%'])
+                ->orWhereRaw('LOWER(career) LIKE ?', ['%' . $filter . '%']);
+        });
+
+        // teacher filter
+        $query->orWhereHas('teacher', function ($q) use ($filter) {
+            $q->whereRaw('LOWER(department) LIKE ?', ['%' . $filter . '%']);
+        });
+
+        return $query->paginate($perPage);
     }
+
+
 
 
     public function query()
