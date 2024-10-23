@@ -16,7 +16,6 @@ class SessionTest extends TestCase
         parent::setUp();
         //Create roles
         Role::factory(3)->create();
-        //Create a new user
         $this->user = User::factory(1)->create([
             'state' => '1'
         ])->first();
@@ -62,8 +61,9 @@ class SessionTest extends TestCase
         $response->assertJsonApiValidationErrors('password' , 401);
     }
 
-    public function account_does_not_exist()
+    public function test_account_does_not_exist()
     {
+
         $response = $this->postJson(
             route('api.user.login'),
             [
@@ -117,8 +117,6 @@ class SessionTest extends TestCase
 
         $response->assertJsonApiValidationErrors('password');
     }
-
-
 
     public function test_email_is_required()
     {

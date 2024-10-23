@@ -39,7 +39,7 @@ class UserFactory extends Factory
             'user_name' => fake()->name() . '_' . fake()->lastName(),
             'code' => $code,
             'email' => fake()->unique()->safeEmail(),
-            'role_id' => fake()->numberBetween(0, 3),
+            'role_id' => fake()->numberBetween(1, 3),
         ];
     }
 
